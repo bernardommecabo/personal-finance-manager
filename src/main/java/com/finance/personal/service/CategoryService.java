@@ -1,11 +1,17 @@
 package com.finance.personal.service;
 
+import com.finance.personal.dto.response.CategoryDTOResponse;
+import com.finance.personal.dto.response.MessageDTOResponse;
 import com.finance.personal.exception.DuplicatedItemException;
+import com.finance.personal.exception.NotFoundException;
 import com.finance.personal.repository.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.finance.personal.dto.request.CategoryDTORequest;
 import com.finance.personal.model.CategoryEntity;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class CategoryService {
@@ -22,11 +28,30 @@ public class CategoryService {
         return categoryRepository.save(categoryEntity);
     }
 
-    //findAll que retorna a lista com todas as categorias
+    public List<CategoryDTOResponse> getAllCategory(){
+        List<CategoryEntity> categoryEntities = categoryRepository.findAll();
+        List<CategoryDTOResponse> responses = categoryEntities.stream()
+                .map(CategoryDTOResponse::new)
+                .collect(Collectors.toList());
+        return responses;
+    }
 
-    //findByID, recebe um ID como parâmetro, verifica no banco e se não existir = categoria not found
-    //se ID existir devolve ID, nome
+    public CategoryDTOResponse getCategoryById(Long id){
+        CategoryEntity categoryEntity = categoryRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Category ID:" + id + " not found"));
+        CategoryDTOResponse response = new CategoryDTOResponse();
+        response.setId(id);
+        response.setName(categoryEntity.getName());
+        return response;
+    }
 
-    //Method - Deletar categoria pelo ID, recebe ID como parâmetro, se não existir = categoria not found
-    // se ID existir = deleta e devolve message(Categoria {nome} deletada com sucesso)
+    public MessageDTOResponse deleteCategoryById(Long id){
+        MessageDTOResponse messageDTOResponse = new MessageDTOResponse();
+        if(!categoryRepository.existsById(id)){
+            throw new NotFoundException("Category ID:" + id + " not found");
+        }
+        categoryRepository.deleteById(id);
+        messageDTOResponse.setMessage("Category ID:" + id + " has been deleted");
+        return messageDTOResponse;
+    }
 }
