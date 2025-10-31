@@ -1,7 +1,6 @@
 package com.finance.personal.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,8 +8,10 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class CategoryDTORequest {
-    @NotBlank (message = "Category name must not be null")
+public class UserProfileDTORequest {
+    @NotBlank(message = "Username must not be null")
     private String name;
 
+    @NotBlank(message = "Email must not be null")
+    private String email;
 }

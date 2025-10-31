@@ -1,6 +1,6 @@
 package com.finance.personal.model;
 
-public class WalletEntity {
+public class AccountEntity {
 
     //saldo
     //a cada transaction

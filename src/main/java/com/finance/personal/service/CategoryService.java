@@ -18,22 +18,22 @@ public class CategoryService {
     @Autowired
     private CategoryRepository categoryRepository;
 
-    public CategoryEntity createNewCategory(CategoryDTORequest request){
+    public CategoryDTOResponse createNewCategory(CategoryDTORequest request){
         CategoryEntity exist = categoryRepository.findByName(request.getName());
         if(exist != null){
             throw new DuplicatedItemException("Category already exists");
         }
         CategoryEntity categoryEntity = new CategoryEntity();
         categoryEntity.setName(request.getName());
-        return categoryRepository.save(categoryEntity);
+        categoryRepository.save(categoryEntity);
+        return new CategoryDTOResponse(categoryEntity.getId(),categoryEntity.getName());
     }
 
     public List<CategoryDTOResponse> getAllCategory(){
         List<CategoryEntity> categoryEntities = categoryRepository.findAll();
-        List<CategoryDTOResponse> responses = categoryEntities.stream()
+        return categoryEntities.stream()
                 .map(CategoryDTOResponse::new)
                 .collect(Collectors.toList());
-        return responses;
     }
 
     public CategoryDTOResponse getCategoryById(Long id){
@@ -45,11 +45,19 @@ public class CategoryService {
         return response;
     }
 
+    public CategoryDTOResponse updateCategory(Long id, String name){
+        CategoryEntity categoryEntity = categoryRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Category ID:" + id + " not found"));
+        categoryEntity.setName(name);
+        categoryRepository.save(categoryEntity);
+        return new CategoryDTOResponse(categoryEntity.getId(),categoryEntity.getName());
+    }
+
     public MessageDTOResponse deleteCategoryById(Long id){
-        MessageDTOResponse messageDTOResponse = new MessageDTOResponse();
         if(!categoryRepository.existsById(id)){
             throw new NotFoundException("Category ID:" + id + " not found");
         }
+        MessageDTOResponse messageDTOResponse = new MessageDTOResponse();
         categoryRepository.deleteById(id);
         messageDTOResponse.setMessage("Category ID:" + id + " has been deleted");
         return messageDTOResponse;

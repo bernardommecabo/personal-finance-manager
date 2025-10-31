@@ -1,16 +1,15 @@
 package com.finance.personal.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 @Getter
 @Setter
 @AllArgsConstructor
-public class CategoryDTORequest {
-    @NotBlank (message = "Category name must not be null")
-    private String name;
-
+public class AccountDTORequest {
+    private Long id;
 }
