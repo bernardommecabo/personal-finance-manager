@@ -1,0 +1,110 @@
+package com.finance.personal.service;
+
+import com.finance.personal.dto.request.AccountDTORequest;
+import com.finance.personal.dto.response.AccountDTOResponse;
+import com.finance.personal.dto.response.MessageDTOResponse;
+import com.finance.personal.exception.DuplicatedItemException;
+import com.finance.personal.exception.NotFoundException;
+import com.finance.personal.model.AccountEntity;
+import com.finance.personal.model.UserEntity;
+import com.finance.personal.repository.AccountRepository;
+import com.finance.personal.repository.UserRepository;
+import jakarta.annotation.Nullable;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.util.List;
+
+@Service
+public class AccountService {
+    @Autowired
+    private AccountRepository accountRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    public AccountDTOResponse addAccount(AccountDTORequest accountDTORequest,Long userId) {
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User not found"));
+        AccountEntity exist = accountRepository.findByName(accountDTORequest.getName());
+        if (exist != null) {
+            throw new DuplicatedItemException("Account with the same name already exists");
+        }
+
+        AccountEntity newAccount = new AccountEntity();
+        newAccount.setName(accountDTORequest.getName());
+        newAccount.setBankName(accountDTORequest.getBankName());
+
+        if (accountDTORequest.getBalance() != null) {
+            newAccount.setBalance(accountDTORequest.getBalance());
+        }
+        BigDecimal newBalance = BigDecimal.valueOf(0);
+        newAccount.setBalance(newBalance);
+
+        newAccount.setCurrency(accountDTORequest.getCurrency());
+        newAccount.setUser(user);
+        accountRepository.save(newAccount);
+        return new AccountDTOResponse(newAccount);
+    }
+
+    public List<AccountDTOResponse> getAllUserAccounts(Long userId) {
+        AccountEntity exist = accountRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User not found"));
+
+        if(!exist.getUser().getId().equals(userId)) {
+            throw new SecurityException("Access denied");
+        }
+
+        return accountRepository.findAllByUserId(userId)
+                .stream()
+                .map(AccountDTOResponse :: new)
+                .toList();
+    }
+
+    public AccountDTOResponse getAccountById(Long accountId, Long userId) {
+        AccountEntity account = accountRepository.findById(accountId)
+                .orElseThrow(() -> new NotFoundException("Account ID: " + accountId + " not found"));
+
+        if(!account.getUser().getId().equals(userId)) {
+            throw new SecurityException("Access denied");
+        }
+        return new AccountDTOResponse(account);
+    }
+
+    public AccountDTOResponse updateAccount(@Nullable String accountName,@Nullable String bankName,@Nullable String currency,@Nullable BigDecimal balance, Long userId, Long accountId) {
+        AccountEntity account = accountRepository.findById(accountId)
+                .orElseThrow(() -> new NotFoundException("Account ID: " + accountId + " not found"));
+
+        if(!account.getUser().getId().equals(userId)) {
+            throw new SecurityException("Access denied");
+        }
+
+        if (accountName != null) {
+            AccountEntity nameExists = accountRepository.findByName(accountName);
+            if (nameExists != null && !nameExists.getId().equals(accountId)) {
+                throw new DuplicatedItemException("This name already exists");
+            }
+            account.setName(accountName);
+        }
+
+        account.setBalance(balance);
+        account.setBankName(bankName);
+        account.setCurrency(currency);
+        accountRepository.save(account);
+        return new AccountDTOResponse(account);
+    }
+
+    public MessageDTOResponse deleteAccount(Long userId, Long accountId){
+        AccountEntity account = accountRepository.findById(accountId)
+                .orElseThrow(() -> new NotFoundException("Account ID: " + accountId + " not found"));
+
+        if(!account.getUser().getId().equals(userId)) {
+            throw new SecurityException("Access denied");
+        }
+        MessageDTOResponse messageDTOResponse = new MessageDTOResponse();
+        accountRepository.deleteById(accountId);
+        messageDTOResponse.setMessage("Account ID: " + accountId + " has been deleted");
+        return messageDTOResponse;
+    }
+}

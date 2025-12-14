@@ -38,4 +38,12 @@ public class GlobalExceptionHandler {
                 .collect(Collectors.toList()));
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(SecurityException.class)
+    public ResponseEntity<ErrorResponse> handleSecurityException(SecurityException exception){
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setMessage("Security Error");
+        errorResponse.getDetails().add(exception.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
+    }
 }

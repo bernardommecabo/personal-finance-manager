@@ -14,38 +14,38 @@ import java.util.List;
 
 @RestController
 @Validated
-@RequestMapping("/category")
+@RequestMapping("/user/{userId}/category")
 public class CategoryController {
     @Autowired
     private CategoryService categoryService;
 
     @PostMapping
-    public ResponseEntity<CategoryDTOResponse> createNewCategory(@RequestBody @Valid CategoryDTORequest request) {
-        CategoryDTOResponse categoryDTOResponse = categoryService.createNewCategory(request);
+    public ResponseEntity<CategoryDTOResponse> createNewCategory(@PathVariable Long userId, @RequestBody @Valid CategoryDTORequest request) {
+        CategoryDTOResponse categoryDTOResponse = categoryService.createNewCategory(request, userId);
         return new ResponseEntity<>(categoryDTOResponse, HttpStatus.CREATED);
     }
 
     @GetMapping
-    public ResponseEntity<List<CategoryDTOResponse>> getAllCategory() {
-        List<CategoryDTOResponse> categoryDTOResponse = categoryService.getAllCategory();
+    public ResponseEntity<List<CategoryDTOResponse>> getAllCategory(@PathVariable Long userId) {
+        List<CategoryDTOResponse> categoryDTOResponse = categoryService.getAllCategory(userId);
         return new ResponseEntity<>(categoryDTOResponse,HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CategoryDTOResponse> getCategoryById(@PathVariable Long id) {
-        CategoryDTOResponse categoryDTOResponse = categoryService.getCategoryById(id);
+    public ResponseEntity<CategoryDTOResponse> getCategoryById(@PathVariable Long userId, @PathVariable Long id) {
+        CategoryDTOResponse categoryDTOResponse = categoryService.getCategoryById(id, userId);
         return new ResponseEntity<>(categoryDTOResponse, HttpStatus.OK);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CategoryDTOResponse> updateCategory(@PathVariable Long id, @RequestBody @Valid String name) {
-        CategoryDTOResponse categoryDTOResponse = categoryService.updateCategory(id, name);
+    public ResponseEntity<CategoryDTOResponse> updateCategory(@PathVariable Long userId, @PathVariable Long id, @RequestBody @Valid String name) {
+        CategoryDTOResponse categoryDTOResponse = categoryService.updateCategory(id, name, userId);
         return new ResponseEntity<>(categoryDTOResponse, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<MessageDTOResponse> deleteCategoryById(@PathVariable Long id) {
-        MessageDTOResponse messageDTOResponse = categoryService.deleteCategoryById(id);
+    public ResponseEntity<MessageDTOResponse> deleteCategoryById(@PathVariable Long userId, @PathVariable Long id) {
+        MessageDTOResponse messageDTOResponse = categoryService.deleteCategoryById(id, userId);
         return new ResponseEntity<>(messageDTOResponse, HttpStatus.OK);
     }
 }

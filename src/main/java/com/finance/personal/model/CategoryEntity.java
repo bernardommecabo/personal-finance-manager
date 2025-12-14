@@ -12,7 +12,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name="category")
+@Table(name="tb_category")
 public class CategoryEntity {
 
     @Id
@@ -20,4 +20,8 @@ public class CategoryEntity {
     private Long id;
 
     private String name;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private UserEntity user;
 }

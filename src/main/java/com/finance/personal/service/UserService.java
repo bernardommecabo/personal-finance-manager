@@ -73,8 +73,6 @@ public class UserService {
         return new UserDTOResponse(userEntity);
     }
 
-    //Update password method
-
     public MessageDTOResponse deleteUserById(Long id) {
         if (!userRepository.existsById(id)) {
             throw new NotFoundException("User ID:" + id + " not found");

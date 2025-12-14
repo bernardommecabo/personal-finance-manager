@@ -13,4 +13,5 @@ public class CategoryDTORequest {
     @NotBlank (message = "Category name must not be null")
     private String name;
 
+    private Long userId;
 }
