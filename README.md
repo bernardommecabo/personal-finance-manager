@@ -5,6 +5,7 @@
   <img src="https://img.shields.io/badge/Spring_Boot-6DB33F?style=for-the-badge&logo=spring&logoColor=white" alt="Spring Boot" />
   <img src="https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white" alt="MySQL" />
   <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker" />
+  <img src="https://img.shields.io/badge/Swagger-85EA2D?style=for-the-badge&logo=swagger&logoColor=black" alt="Swagger" />
 </p>
 
 ## 🎯 About The Project
@@ -20,6 +21,7 @@ The API allows users to manage their accounts, transaction categories (e.g., "Fo
 * **Category CRUD:** Create and manage transaction categories.
 * **Account CRUD:** Manage different bank accounts or wallets.
 * **Transaction Logging:** Endpoints to create, list, update, and delete income and expenses.
+* **Interactive Documentation:** Fully documented API using Swagger UI / OpenAPI.
 * **Data Validation:** Ensures data integrity at the API entry point.
 * **Exception Handling:** Standardized error responses for the client.
 
@@ -30,6 +32,7 @@ The API allows users to manage their accounts, transaction categories (e.g., "Fo
     * Spring Web (For the REST API)
     * Spring Data JPA (For data persistence)
     * Spring Validation (For DTO validation)
+    * SpringDoc OpenAPI (For API Documentation & Swagger UI)
     * (Optional: Spring Security for authentication)
 * **MySQL:** Relational database for persistence.
 * **JPA / Hibernate:** Object-Relational Mapping (ORM).
@@ -52,6 +55,20 @@ The API uses a `GlobalExceptionHandler` (`@ControllerAdvice`) to intercept and s
 
 This is especially powerful for validations: the API can return a list of *all* invalid fields in a single request, improving the user and front-end developer experience.
 
+## 📚 API Documentation (Swagger UI)
+
+This project implements **OpenAPI 3** standards using **SpringDoc**. You can visualize, explore, and test the API endpoints interactively without needing external tools like Postman.
+
+Once the application is running, access:
+
+* **Swagger UI (Visual Interface):**
+  [`http://localhost:8080/swagger-ui/index.html`](http://localhost:8080/swagger-ui/index.html)
+
+* **OpenAPI JSON (Raw Spec):**
+  [`http://localhost:8080/v3/api-docs`](http://localhost:8080/v3/api-docs)
+
+> The Swagger UI allows you to see all available controllers, models, and execute requests directly from your browser.
+
 ## ⚙️ How to Run The Project
 
 There are two ways to run the application:
@@ -73,10 +90,12 @@ $git clone [https://github.com/bernardommecabo/personal-finance-manager.git$](ht
 $ docker-compose up -d --build
 
 # 3. Access the application
-The API will be available at http://localhost:8080
+# API root: http://localhost:8080
+# Swagger UI: http://localhost:8080/swagger-ui/index.html
 ```
 
 ### Option 2: Locally (Without Docker)
+
 * [Git](https://git-scm.com/downloads)
 * [Java 21 (or higher)](https://www.oracle.com/java/technologies/downloads/)
 * [Maven](https://maven.apache.org/download.cgi)

@@ -35,13 +35,9 @@ public class AccountService {
         AccountEntity newAccount = new AccountEntity();
         newAccount.setName(accountDTORequest.getName());
         newAccount.setBankName(accountDTORequest.getBankName());
-
         if (accountDTORequest.getBalance() != null) {
             newAccount.setBalance(accountDTORequest.getBalance());
         }
-        BigDecimal newBalance = BigDecimal.valueOf(0);
-        newAccount.setBalance(newBalance);
-
         newAccount.setCurrency(accountDTORequest.getCurrency());
         newAccount.setUser(user);
         accountRepository.save(newAccount);
@@ -72,7 +68,7 @@ public class AccountService {
         return new AccountDTOResponse(account);
     }
 
-    public AccountDTOResponse updateAccount(@Nullable String accountName,@Nullable String bankName,@Nullable String currency,@Nullable BigDecimal balance, Long userId, Long accountId) {
+    public AccountDTOResponse updateAccount(AccountDTORequest request, Long userId, Long accountId) {
         AccountEntity account = accountRepository.findById(accountId)
                 .orElseThrow(() -> new NotFoundException("Account ID: " + accountId + " not found"));
 
@@ -80,17 +76,17 @@ public class AccountService {
             throw new SecurityException("Access denied");
         }
 
-        if (accountName != null) {
-            AccountEntity nameExists = accountRepository.findByName(accountName);
+        if (request.getName() != null) {
+            AccountEntity nameExists = accountRepository.findByName(request.getName());
             if (nameExists != null && !nameExists.getId().equals(accountId)) {
                 throw new DuplicatedItemException("This name already exists");
             }
-            account.setName(accountName);
+            account.setName(request.getName());
         }
 
-        account.setBalance(balance);
-        account.setBankName(bankName);
-        account.setCurrency(currency);
+        account.setBalance(request.getBalance());
+        account.setBankName(request.getBankName());
+        account.setCurrency(request.getCurrency());
         accountRepository.save(account);
         return new AccountDTOResponse(account);
     }

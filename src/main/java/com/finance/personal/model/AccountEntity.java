@@ -23,7 +23,10 @@ public class AccountEntity {
 
     private String name;
     private String bankName;
-    private BigDecimal balance;
+
+    @Column(nullable = false)
+    private BigDecimal balance =  BigDecimal.ZERO;
+
     private String currency;
 
     @ManyToOne
