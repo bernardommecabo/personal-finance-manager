@@ -12,6 +12,7 @@ import com.finance.personal.model.TransactionEntity;
 import com.finance.personal.repository.AccountRepository;
 import com.finance.personal.repository.CategoryRepository;
 import com.finance.personal.repository.TransactionRepository;
+import com.finance.personal.service.validation.OwnershipValidator;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,13 +35,18 @@ public class TransactionService {
     @Autowired
     private CategoryRepository categoryRepository;
 
+    @Autowired
+    private OwnershipValidator ownershipValidator;
+
     @Transactional
-    public TransactionDTOResponse createNewTransaction(TransactionDTORequest request, Long accountId) {
+    public TransactionDTOResponse createNewTransaction(TransactionDTORequest request, Long accountId, Long userId) {
         AccountEntity account = accountRepository.findById(accountId)
                 .orElseThrow(() -> new NotFoundException("Account not found"));
+        ownershipValidator.validateAccountOwnership(account, userId);
 
         CategoryEntity category = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new NotFoundException("Category not found"));
+        ownershipValidator.validateAccountOwnership(account, userId);
 
         TransactionEntity transactionEntity = new TransactionEntity();
         transactionEntity.setAccount(account);

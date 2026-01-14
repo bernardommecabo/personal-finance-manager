@@ -27,6 +27,4 @@ public class TransactionDTORequest {
     private String description;
 
     private Long categoryId;
-
-    private Long accountId;
 }

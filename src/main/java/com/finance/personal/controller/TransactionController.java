@@ -24,8 +24,8 @@ public class TransactionController {
 
     @PostMapping
     @Operation(summary = "Create a new transaction", description = "Create a new transaction for an account")
-    public ResponseEntity<?> createNewTransaction(@PathVariable Long accountId, @RequestBody @Valid TransactionDTORequest request){
-        TransactionDTOResponse transactionDTOResponse = transactionService.createNewTransaction(request,accountId);
+    public ResponseEntity<?> createNewTransaction(@PathVariable Long accountId,@PathVariable Long userId, @RequestBody @Valid TransactionDTORequest request){
+        TransactionDTOResponse transactionDTOResponse = transactionService.createNewTransaction(request,accountId,userId);
         return new ResponseEntity<>(transactionDTOResponse,HttpStatus.CREATED);
     }
 

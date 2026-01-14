@@ -27,6 +27,7 @@ public class CategoryService {
     public CategoryDTOResponse createNewCategory(CategoryDTORequest request, Long userId) {
         UserEntity user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User not found"));
+
         CategoryEntity exist = categoryRepository.findByName(request.getName());
         if(exist != null){
             throw new DuplicatedItemException("Category already exists");

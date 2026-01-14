@@ -9,6 +9,7 @@ import com.finance.personal.model.AccountEntity;
 import com.finance.personal.model.UserEntity;
 import com.finance.personal.repository.AccountRepository;
 import com.finance.personal.repository.UserRepository;
+import com.finance.personal.service.validation.OwnershipValidator;
 import jakarta.annotation.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,13 +25,14 @@ public class AccountService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private OwnershipValidator ownershipValidator;
+
     public AccountDTOResponse addAccount(AccountDTORequest accountDTORequest,Long userId) {
         UserEntity user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User not found"));
         AccountEntity exist = accountRepository.findByName(accountDTORequest.getName());
-        if (exist != null) {
-            throw new DuplicatedItemException("Account with the same name already exists");
-        }
+        ownershipValidator.validateAccountOwnership(exist, userId);
 
         AccountEntity newAccount = new AccountEntity();
         newAccount.setName(accountDTORequest.getName());
@@ -47,10 +49,7 @@ public class AccountService {
     public List<AccountDTOResponse> getAllUserAccounts(Long userId) {
         AccountEntity exist = accountRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User not found"));
-
-        if(!exist.getUser().getId().equals(userId)) {
-            throw new SecurityException("Access denied");
-        }
+        ownershipValidator.validateAccountOwnership(exist, userId);
 
         return accountRepository.findAllByUserId(userId)
                 .stream()
@@ -61,20 +60,15 @@ public class AccountService {
     public AccountDTOResponse getAccountById(Long accountId, Long userId) {
         AccountEntity account = accountRepository.findById(accountId)
                 .orElseThrow(() -> new NotFoundException("Account ID: " + accountId + " not found"));
+        ownershipValidator.validateAccountOwnership(account, userId);
 
-        if(!account.getUser().getId().equals(userId)) {
-            throw new SecurityException("Access denied");
-        }
         return new AccountDTOResponse(account);
     }
 
     public AccountDTOResponse updateAccount(AccountDTORequest request, Long userId, Long accountId) {
         AccountEntity account = accountRepository.findById(accountId)
                 .orElseThrow(() -> new NotFoundException("Account ID: " + accountId + " not found"));
-
-        if(!account.getUser().getId().equals(userId)) {
-            throw new SecurityException("Access denied");
-        }
+        ownershipValidator.validateAccountOwnership(account, userId);
 
         if (request.getName() != null) {
             AccountEntity nameExists = accountRepository.findByName(request.getName());
@@ -94,10 +88,8 @@ public class AccountService {
     public MessageDTOResponse deleteAccount(Long userId, Long accountId){
         AccountEntity account = accountRepository.findById(accountId)
                 .orElseThrow(() -> new NotFoundException("Account ID: " + accountId + " not found"));
+        ownershipValidator.validateAccountOwnership(account, userId);
 
-        if(!account.getUser().getId().equals(userId)) {
-            throw new SecurityException("Access denied");
-        }
         MessageDTOResponse messageDTOResponse = new MessageDTOResponse();
         accountRepository.deleteById(accountId);
         messageDTOResponse.setMessage("Account ID: " + accountId + " has been deleted");
